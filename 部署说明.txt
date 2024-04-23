@@ -1,0 +1,38 @@
+1、创建目录
+mkdir -p /tgdata/data1/{assign,bgtemp,captures,fail,pcaps,protocol,success,test,ttemp}
+
+cd /tgdata/data1/pcaps
+
+mkdir -p {thpcaps,bgpcaps}
+
+cd /tgdata/data1/bgtemp
+
+mkdir -p {parse,send,upload,pcap}
+
+cd /tgdata/data1/protocol 
+
+mkdir -p {data,report,ssl,payload}
+
+cd /tgdata/
+
+cat >/etc/rc.local<<EOF
+#!/bin/sh
+
+touch /var/lock/subsys/local
+
+mkdir -p /tgdata/user/{fail,success,pcaps,send,upload}
+mount --bind /tgdata/data1/fail /tgdata/user/fail
+mount --bind /tgdata/data1/success /tgdata/user/success
+mount --bind /tgdata/data1/pcaps /tgdata/user/pcaps
+mount --bind /tgdata/data1/bgtemp/send /tgdata/user/send
+mount --bind /tgdata/data1/bgtemp/upload /tgdata/user/upload
+chown tgftp -R /tgdata/user
+chmod 766 -R /tgdata/user
+
+EOF
+
+chmod +x /etc/rc.local
+chmod +x /etc/rc.d/rc.local
+
+systemctl enable rc-local
+systemctl start rc-local
